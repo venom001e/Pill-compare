@@ -1,1 +1,1 @@
-# Pill-compare
+# QuickPill3 - Pill-compare
