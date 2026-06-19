@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        ((request.auth.token.email == "amarjeetbth2@gmail.com" && request.auth.token.email_verified == true) || 
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow get: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAuthenticated() && (isOwner(userId) || (isAdmin() && request.resource.data.role == resource.data.role));
+    }
+
+    // Prescriptions
+    match /prescriptions/{prescriptionId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Search History
+    match /searches/{searchId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Traffic Logs
+    match /traffic/{logId} {
+      allow read, list: if isAdmin();
+      allow create: if true; // Allow logging from any client
+    }
+
+    // App Settings
+    match /settings/{settingId} {
+      allow read: if true; // Everyone can read settings (e.g., social links)
+      allow write: if isAdmin(); // Only admins can update settings
+    }
+
+    // Site Content
+    match /content/{pageId} {
+      allow read: if true; // Everyone can read content
+      allow write: if isAdmin(); // Only admins can update content
+    }
+
+    // Vehicle Owners
+    match /vehicle_owners/{ownerId} {
+      allow read: if true; // Allow public to find owners (essential for the platform)
+      allow create: if isAuthenticated() && 
+                      request.auth.uid == request.resource.data.uid &&
+                      request.resource.data.isVerified == false; // Must start unverified
+      allow update: if isAuthenticated() && (
+                      (request.auth.uid == resource.data.uid && 
+                       request.resource.data.isVerified == resource.data.isVerified) || 
+                      isAdmin()
+                    );
+      allow delete: if isAdmin();
+    }
+    
+    // Available Cities
+    match /available_cities/{cityId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
