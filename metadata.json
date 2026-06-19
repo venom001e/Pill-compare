@@ -1,0 +1,6 @@
+{
+  "name": "QuickPill",
+  "description": "Modern medicine price comparison platform with prescription scanning, real-time tracking, and analytics.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,154 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and activity data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLogin": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Prescription": {
+      "title": "Prescription",
+      "description": "Uploaded prescription and extracted medicines",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "extractedMedicines": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "imageUrl"]
+    },
+    "SearchHistory": {
+      "title": "SearchHistory",
+      "description": "Medicine search history for users",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "query": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "query"]
+    },
+    "TrafficLog": {
+      "title": "TrafficLog",
+      "description": "Real-time traffic tracing for admin",
+      "type": "object",
+      "properties": {
+        "path": { "type": "string" },
+        "userId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "userAgent": { "type": "string" }
+      },
+      "required": ["path", "timestamp"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Application-wide settings and configuration",
+      "type": "object",
+      "properties": {
+        "socialLinks": {
+          "type": "object",
+          "properties": {
+            "instagram": { "type": "string" },
+            "linkedin": { "type": "string" },
+            "twitter": { "type": "string" },
+            "facebook": { "type": "string" }
+          }
+        },
+        "payment": {
+          "type": "object",
+          "properties": {
+            "upiId": { "type": "string" },
+            "merchantName": { "type": "string" },
+            "qrImageBase64": { "type": "string" }
+          }
+        }
+      }
+    },
+    "Content": {
+      "title": "Site Content",
+      "description": "Editable text content for various pages of the application.",
+      "type": "object",
+      "properties": {
+        "home": {
+          "type": "object",
+          "properties": {
+            "heroTitle": { "type": "string" },
+            "heroSubtitle": { "type": "string" }
+          }
+        },
+        "about": {
+          "type": "object",
+          "properties": {
+            "mission": { "type": "string" },
+            "vision": { "type": "string" }
+          }
+        }
+      }
+    },
+    "VehicleOwner": {
+      "title": "Vehicle Owner",
+      "description": "Registered vehicle owners for local delivery/transport.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "city": { "type": "string" },
+        "pincode": { "type": "string" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "vehicleType": { "type": "string" },
+        "vehicleNumber": { "type": "string" },
+        "rentPrice": { "type": "string" },
+        "isVerified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "city", "vehicleType"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents"
+    },
+    "/prescriptions/{prescriptionId}": {
+      "schema": "Prescription",
+      "description": "Prescription scan records"
+    },
+    "/searches/{searchId}": {
+      "schema": "SearchHistory",
+      "description": "User search history"
+    },
+    "/traffic/{logId}": {
+      "schema": "TrafficLog",
+      "description": "App traffic logs"
+    },
+    "/settings/{settingId}": {
+      "schema": "Settings",
+      "description": "App settings"
+    },
+    "/content/{pageId}": {
+      "schema": "Content",
+      "description": "Page-specific content documents."
+    },
+    "/vehicle_owners/{ownerId}": {
+      "schema": "VehicleOwner",
+      "description": "Registered vehicle owners."
+    }
+  }
+}
